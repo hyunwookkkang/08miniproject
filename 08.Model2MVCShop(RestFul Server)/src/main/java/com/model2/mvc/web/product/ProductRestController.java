@@ -37,6 +37,13 @@ public class ProductRestController {
 	public ProductRestController(){
 		System.out.println(this.getClass());
 	}
+	@Value("#{commonProperties['pageUnit']}")
+	//@Value("#{commonProperties['pageUnit'] ?: 3}")
+	int pageUnit;
+	
+	@Value("#{commonProperties['pageSize']}")
+	//@Value("#{commonProperties['pageSize'] ?: 2}")
+	int pageSize;
 	//ว๖:getProduct
 	@RequestMapping( value="json/getProduct/{prodNo}", method=RequestMethod.GET )
 	public Product getProduct( @PathVariable int prodNo ) throws Exception{
@@ -62,4 +69,25 @@ public class ProductRestController {
 		
 		return dbProduct;
 	}
+
+	@RequestMapping( value="json/updateProductView", method=RequestMethod.GET )
+	public Product updateProductView(@RequestParam("prodNo") int prodNo ,
+									HttpSession session )throws Exception{
+		System.out.println("/product/updateProductView: GET");
+		return  productService.getProduct(prodNo);
+	}
+	
+	@RequestMapping( value="json/listProduct")
+	public  Map<String, Object> listProduct( @PathVariable Search search ) throws Exception{
+System.out.println("/product/listProduct : GET / POST");
+		
+		if(search.getCurrentPage() ==0 ){
+			search.setCurrentPage(1);
+		}
+		search.setPageSize(pageSize);
+		
+		// Business logic ผ๖วเ
+		return productService.getProductList(search);
+	}
+	
 }
